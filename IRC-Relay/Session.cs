@@ -22,7 +22,7 @@ namespace IRCRelay
 {
     public class Session
     {
-        public enum MessageDestination {
+        public enum TargetBot {
             Discord,
             IRC
         };
@@ -61,14 +61,30 @@ namespace IRCRelay
             await irc.SpawnBot();
         }
 
-        public void SendMessage(MessageDestination dest, string message, string username = "")
+        public void Recover(TargetBot bot) {
+            switch (bot)
+            {
+                /* Recovering IRC can be annoying, so if IRC fails we'll just kill everything.
+                 * This change's intention is to prevent discord reconnnects from nipping the IRC
+                 * bot in and out of the server annoyingly on discord failures (which happens often)
+                 */
+                case TargetBot.IRC: // kill, and let main loop remake
+                    this.Kill();
+                    break;
+                case TargetBot.Discord: // discord died, try new spawn.
+                    Task.Run(async () => await discord.SpawnBot());
+                    break;
+            }
+        }
+
+        public void SendMessage(TargetBot dest, string message, string username = "")
         {
             switch (dest)
             {
-                case MessageDestination.Discord:
+                case TargetBot.Discord:
                     discord.SendMessageAllToTarget(config.DiscordGuildName, message, config.DiscordChannelName);
                     break;
-                case MessageDestination.IRC:
+                case TargetBot.IRC:
                     irc.SendMessage(username, message);
                     break;
             }
