@@ -84,7 +84,7 @@ namespace IRCRelay
         {
             /* Create a new thread to recover the session. We cannot block
              * this Disconnect call */
-            new System.Threading.Thread(() => session.Recover(Session.TargetBot.Discord)).Start();
+            new System.Threading.Thread(async () => await session.Recover(Session.TargetBot.Discord)).Start();
 
             await Log(new LogMessage(LogSeverity.Critical, "OnDiscordDisconnect", ex.Message));
         }

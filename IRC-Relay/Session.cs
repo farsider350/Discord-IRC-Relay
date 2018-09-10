@@ -61,7 +61,7 @@ namespace IRCRelay
             await irc.SpawnBot();
         }
 
-        public void Recover(TargetBot bot) {
+        public async Task Recover(TargetBot bot) {
             switch (bot)
             {
                 /* Recovering IRC can be annoying, so if IRC fails we'll just kill everything.
@@ -72,7 +72,7 @@ namespace IRCRelay
                     this.Kill();
                     break;
                 case TargetBot.Discord: // discord died, try new spawn.
-                    Task.Run(async () => await discord.SpawnBot());
+                    await discord.SpawnBot();
                     break;
             }
         }
