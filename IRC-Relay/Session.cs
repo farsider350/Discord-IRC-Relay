@@ -72,6 +72,7 @@ namespace IRCRelay
                     this.Kill();
                     break;
                 case TargetBot.Discord: // discord died, try new spawn.
+                    discord.Dispose();
                     await discord.SpawnBot();
                     break;
             }
